@@ -23,6 +23,7 @@ fc8_w = tf.Variable(tf.truncated_normal(shape=shape, mean=0, stddev=1e-2))
 fc8_b = tf.Variable(tf.zeros(nb_classes))
 #logits = tf.matmul(fc7, fc8_w) + fc8_b
 logits = tf.nn.xw_plus_b(fc7, fc8_w, fc8_b)
+print(logits.get_shape())
 probs = tf.nn.softmax(logits)
 
 init = tf.global_variables_initializer()

@@ -38,6 +38,8 @@ init_op = tf.global_variables_initializer()
 preds = tf.arg_max(logits, 1)
 accuracy_op = tf.reduce_mean(tf.cast(tf.equal(preds, labels), tf.float32))
 
+preds = tf.equal(tf.argmax(logits, 1), 1)
+accuracy_op = tf.reduce_mean(tf.cast(preds, tf.float32))
 
 def eval_on_data(X, y, sess):
     total_acc = 0
