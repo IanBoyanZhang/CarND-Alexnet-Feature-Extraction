@@ -23,7 +23,9 @@ X_train, X_valid, y_train, y_valid = train_test_split(
 img_shape = X_train[0].shape
 CHANNEL = img_shape[2]
 x = tf.placeholder(tf.float32, (None, img_shape[0], img_shape[1], CHANNEL))
-labels = tf.placeholder(tf.int64, None)
+#labels = tf.placeholder(tf.int64, (None))
+y = tf.placeholder(tf.int64, (None))
+labels = tf.one_hot(y, nb_classes)
 # Required by AlexNet
 resized = tf.image.resize_images(x, (227, 227))
 # TODO: pass placeholder as first argument to `AlexNet`.
@@ -45,7 +47,8 @@ probs = tf.nn.softmax(logits)
 # HINT: Look back at your traffic signs project solution, you may
 # be able to reuse some the code.
 # WHEN TO USE sparse?
-cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels)
+# cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels)
+cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
 loss_operation = tf.reduce_mean(cross_entropy)
 # Should we use AdamOptimizer with certain learning rate?
 optimizer = tf.train.AdamOptimizer(learning_rate=rate)
@@ -62,7 +65,8 @@ def evaluate(X_data, y_data, sess):
   sess = tf.get_default_sesssion()
   for offset in range(0, num_examples, BATCH_SIZE):
     end = offset + BATCH_SIZE
-    batch_x, batch_y = X_data[offset: end], y_data[offset:end]
+    batch_x, batch_y = X_data[offset: end], y_data[offset:end].reshape((128)).squeeze()
+    print("Type:", type(y_data))
     accuracy = sess.run(accuracy_operation, feed_dict={x: batch_x, labels: batch_y})
     total_accuracy += (accuracy * len(batch_x))
   return total_accuracy/ num_examples
@@ -79,6 +83,7 @@ with tf.Session() as sess:
     for offset in range(0, nums_examples, BATCH_SIZE):
       end = offset + BATCH_SIZE
       batch_x, batch_y = X_train[offset:end], y_train[offset:end]
+      print("Type:", type(y_train))
       sess.run(training_operation, feed_dict={x:batch_x, labels:batch_y})
      # batch_accuracy = sess.run(training_operation, feed_dict={x:batch_x, labels:batch_y})
     validation_accuracy = evaluate(X_valid, y_valid, sess)
